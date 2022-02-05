@@ -178,6 +178,7 @@ void chip8::emulateCycle() {
                     programCounter += 2;
                     break;
             }
+            break;
     }
 }
 
