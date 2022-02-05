@@ -104,14 +104,17 @@ void chip8::emulateCycle() {
             break;
         case 0x7000: //Add NN to VX
             cpuRegisters[(opcode & 0x0F00) >> 8] += opcode & 0x00FF;
+            programCounter += 2;
             break;
         case 0x8000: //Whole lotta math with VX and VY
             switch (opcode & 0x000F) {
                 case 0x0000: //Set VX to VY
                     cpuRegisters[(opcode & 0x0F00) >> 8] = cpuRegisters[(opcode & 0x00F0) >> 4];
+                    programCounter += 2;
                     break;
                 case 0x0001: //Set VS to the OR value of VX and VY
                     cpuRegisters[(opcode & 0x0F00) >> 8] = cpuRegisters[(opcode & 0x0F00) >> 8] | cpuRegisters[(opcode & 0x00F0) >> 4];
+                    programCounter += 2;
                     break;
                 case 0x0002:
                     break;
