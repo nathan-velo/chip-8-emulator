@@ -179,6 +179,12 @@ void chip8::emulateCycle() {
                     break;
             }
             break;
+        case 0x9000:
+            if(cpuRegisters[(opcode & 0x0F00) >> 8] != cpuRegisters[(opcode & 0x00F0) >> 4])
+                programCounter += 4;
+            else
+                programCounter += 2;
+            break;
     }
 }
 
