@@ -52,6 +52,7 @@ void chip8::emulateCycle() {
 
 
     //Decode opcode using https://johnearnest.github.io/Octo/docs/chip8ref.pdf as a reference
+    //Also using https://en.wikipedia.org/wiki/CHIP-8#Opcode_table as it has more detailed information
     //At first we only care about the first 4 bits and can add further statements for additional opcodes if necessary
     switch(opcode & 0xF000) {
         case 0x0000:
@@ -61,69 +62,101 @@ void chip8::emulateCycle() {
                 for(int i =0; i< 64 * 32; ++i)
                     gfx[i] = 0x0;
                 break;
+                
             case 0x000E:
                 --stackPointer;
                 programCounter = stack[stackPointer];
                 programCounter += 2;
                 break;
+
             default: //UNKOWN WE'LL JUST IGNORE
                 printf ("Unknown opcode [0x0000]: 0x%X\n", opcode);
                 break;
             }
             break;
+
         case 0x1000: //Jumps to address
             programCounter = opcode & 0x0FFF;
             break;
+
         case 0x2000: //Call subroutine
             programCounter += 2;
             stack[stackPointer] = programCounter;
             ++stackPointer;
             programCounter = opcode & 0x0FFF;
             break;
+
         case 0x3000: //If VX == to NN skip next instruction
             if(cpuRegisters[(opcode & 0x0F00) >> 8] == (opcode & 0x00FF))
                 programCounter += 4;
             else
                 programCounter += 2;
             break;
+
         case 0x4000: //If vx != to vy skip next line
             if(cpuRegisters[(opcode & 0x0F00) >> 8] != (opcode & 0x00FF))
                 programCounter += 4;
             else
                 programCounter += 2;
             break;
+
         case 0x5000: //If vx == to vy skip next line
             if(cpuRegisters[(opcode & 0x0F00) >> 8] == cpuRegisters[(opcode & 0x00F0) >> 4])
                 programCounter += 4;
             else
                 programCounter += 2;
             break;
+
         case 0x6000: //Set VX to NN
             cpuRegisters[(opcode & 0x0F00) >> 8] = opcode & 0x00FF;
             programCounter += 2;
             break;
+
         case 0x7000: //Add NN to VX
             cpuRegisters[(opcode & 0x0F00) >> 8] += opcode & 0x00FF;
             programCounter += 2;
             break;
+
         case 0x8000: //Whole lotta math with VX and VY
             switch (opcode & 0x000F) {
                 case 0x0000: //Set VX to VY
                     cpuRegisters[(opcode & 0x0F00) >> 8] = cpuRegisters[(opcode & 0x00F0) >> 4];
                     programCounter += 2;
                     break;
-                case 0x0001: //Set VS to the OR value of VX and VY
+
+                case 0x0001:    //Set VX to the OR value of VX and VY
                     cpuRegisters[(opcode & 0x0F00) >> 8] = cpuRegisters[(opcode & 0x0F00) >> 8] | cpuRegisters[(opcode & 0x00F0) >> 4];
                     programCounter += 2;
                     break;
-                case 0x0002:
+
+                case 0x0002:    //Set VX to the AND value of VX and VY
+                    cpuRegisters[(opcode & 0x0F00) >> 8] = cpuRegisters[(opcode & 0x0F00) >> 8] & cpuRegisters[(opcode & 0x00F0) >> 4];
+                    programCounter += 2;
                     break;
-                case 0x0003:
+
+                case 0x0003:    //Set VX to the XOR value of VX and VY
+                    cpuRegisters[(opcode & 0x0F00) >> 8] = cpuRegisters[(opcode & 0x0F00) >> 8] ^ cpuRegisters[(opcode & 0x00F0) >> 4];
+                    programCounter += 2;
                     break;
-                case 0x0004:
+
+                case 0x0004:    //Adds VY to VX. VF is set to 1 when there's a carry, and to 0 when there is not.
+                    if(cpuRegisters[(opcode & 0x00F0) >> 4] > (0xFF - cpuRegisters[(opcode & 0x0F00) >> 8])) 
+						cpuRegisters[0xF] = 1; //Final register slot is used for carry
+					else 
+						cpuRegisters[0xF] = 0;	
+                    cpuRegisters[(opcode & 0x0F00) >> 8] += cpuRegisters[(opcode & 0x00F0) >> 4];
+                    programCounter += 2;
                     break;
-                case 0x0005:
+
+                case 0x0005:    //VY is subtracted from VX. VF is set to 0 when there's a borrow, and 1 when there is not.
+                    if(cpuRegisters[(opcode & 0x00F0) >> 4] > cpuRegisters[(opcode & 0x0F00) >> 8])
+						cpuRegisters[0xF] = 0;
+					else 
+						cpuRegisters[0xF] = 1;	
+                    cpuRegisters[(opcode & 0x0F00) >> 8] += cpuRegisters[(opcode & 0x00F0) >> 4];
+                    programCounter += 2;
                     break;
+
                 case 0x0006:
                     break;
                 case 0x0007:
