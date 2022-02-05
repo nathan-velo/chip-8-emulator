@@ -70,7 +70,7 @@ void chip8::emulateCycle() {
                 break;
 
             default: //UNKOWN WE'LL JUST IGNORE
-                printf ("Unknown opcode [0x0000]: 0x%X\n", opcode);
+                printf("Opcode not known or not implemented [0x0000]: 0x%X\n", opcode);
                 break;
             }
             break;
@@ -196,6 +196,16 @@ void chip8::emulateCycle() {
             cpuRegisters[(opcode & 0x0F00) >> 8] = (rand() % 0xFF) & (opcode & 0x00FF);
             programCounter += 2;
             break;
+    }
+
+    if (delayTimer > 0)
+        --delayTimer;
+
+    if (soundTimer > 0)
+    {
+        if (soundTimer == 1)
+        printf("BEEP!\n");
+        --soundTimer;
     }
 }
 
