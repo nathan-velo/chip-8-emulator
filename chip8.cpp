@@ -62,7 +62,7 @@ void chip8::emulateCycle() {
                 for(int i =0; i< 64 * 32; ++i)
                     gfx[i] = 0x0;
                 break;
-                
+
             case 0x000E:
                 --stackPointer;
                 programCounter = stack[stackPointer];
@@ -153,15 +153,29 @@ void chip8::emulateCycle() {
 						cpuRegisters[0xF] = 0;
 					else 
 						cpuRegisters[0xF] = 1;	
-                    cpuRegisters[(opcode & 0x0F00) >> 8] += cpuRegisters[(opcode & 0x00F0) >> 4];
+                    cpuRegisters[(opcode & 0x0F00) >> 8] -= cpuRegisters[(opcode & 0x00F0) >> 4];
                     programCounter += 2;
                     break;
 
-                case 0x0006:
+                case 0x0006:    //Stores the least significant bit of VX in VF and then shifts VX to the right by 1.
+                    cpuRegisters[0xF] = cpuRegisters[(opcode & 0x0F00) >> 8] & 0x1;
+                    cpuRegisters[(opcode & 0x0F00) >> 8] = cpuRegisters[(opcode & 0x0F00) >> 8] >> 1;
+                    programCounter += 2;
                     break;
+
                 case 0x0007:
+                    if(cpuRegisters[(opcode & 0x00F0) >> 4] < cpuRegisters[(opcode & 0x0F00) >> 8])
+						cpuRegisters[0xF] = 0;
+					else 
+						cpuRegisters[0xF] = 1;	
+                    cpuRegisters[(opcode & 0x0F00) >> 8] = cpuRegisters[(opcode & 0x00F0) >> 4] - cpuRegisters[(opcode & 0x0F00) >> 8];
+                    programCounter += 2;
                     break;
+
                 case 0x000E:
+                    cpuRegisters[0xF] = cpuRegisters[(opcode & 0x0F00) >> 8] >> 7;
+                    cpuRegisters[(opcode & 0x0F00) >> 8] = cpuRegisters[(opcode & 0x0F00) >> 8] << 1;
+                    programCounter += 2;
                     break;
             }
     }
