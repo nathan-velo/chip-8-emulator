@@ -185,6 +185,17 @@ void chip8::emulateCycle() {
             else
                 programCounter += 2;
             break;
+        case 0xA000:
+            indexRegister = opcode & 0x0FFF;
+            programCounter += 2;
+            break;
+        case 0xB000:
+            programCounter = (opcode & 0x0FFF) + cpuRegisters[0];
+            break;
+        case 0xC000:
+            cpuRegisters[(opcode & 0x0F00) >> 8] = (rand() % 0xFF) & (opcode & 0x00FF);
+            programCounter += 2;
+            break;
     }
 }
 
