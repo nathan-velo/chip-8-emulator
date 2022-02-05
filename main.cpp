@@ -28,9 +28,9 @@ public:
 			for(int y = 0; y < 32; ++y)
 				for (int x = 0; x < 64; ++x) {
 					if (programChip.gfx[(y * 64) + x] == 0)
-						Draw(x, y, olc::Pixel(255,255,255));	// Disabled
+						Draw(x, y, olc::Pixel(0, 0, 0));	// Disabled
 					else
-						Draw(x, y, olc::Pixel(0,0,0));  // Enabled
+						Draw(x, y, olc::Pixel(255, 255, 255)); // Enabled
 				}
 		}
 		programChip.emulateCycle();
