@@ -36,6 +36,7 @@ chip8::chip8() {
     unsigned char currentKey[16];
 }
 
+
 void chip8::initialize() {
     programCounter = 0x200;
     opcode = 0;
@@ -44,12 +45,38 @@ void chip8::initialize() {
 
     for(int i = 0; i < 80; ++i)
         memory[i] = chip8_fontset[i];	
+
+    // Clear display
+    for (int i = 0; i < 2048; ++i)
+        gfx[i] = 0;
+
+    // Clear stack
+    for (int i = 0; i < 16; ++i)
+        stack[i] = 0;
+
+    for (int i = 0; i < 16; ++i)
+        currentKey[i] = cpuRegisters[i] = 0;
+
+    // Clear memory
+    for (int i = 0; i < 4096; ++i)
+        memory[i] = 0;
+
+    // Load fontset
+    for (int i = 0; i < 80; ++i)
+        memory[i] = chip8_fontset[i];
+
+    // Reset timers
+    delayTimer = 0;
+    soundTimer = 0;
+
+    // Clear screen once
+    drawFlag = true;
 }
 
 void chip8::emulateCycle() {
     //opcode is 2 bytes long so get 2 bytes from memory at current PC location
     opcode = memory[programCounter] << 8 | memory[programCounter + 1];
-
+    printf("%02x\n", (unsigned int)opcode);
 
     //Decode opcode using https://johnearnest.github.io/Octo/docs/chip8ref.pdf as a reference
     //Also using https://en.wikipedia.org/wiki/CHIP-8#Opcode_table as it has more detailed information
@@ -61,6 +88,7 @@ void chip8::emulateCycle() {
             case 0x0000: //0x00E0 CLEAR SCREEN
                 for(int i =0; i< 64 * 32; ++i)
                     gfx[i] = 0x0;
+                programCounter += 2;
                 break;
 
             case 0x000E:
@@ -196,6 +224,40 @@ void chip8::emulateCycle() {
             cpuRegisters[(opcode & 0x0F00) >> 8] = (rand() % 0xFF) & (opcode & 0x00FF);
             programCounter += 2;
             break;
+        case 0xD000:
+        {
+            unsigned short x = cpuRegisters[(opcode & 0x0F00) >> 8];
+            unsigned short y = cpuRegisters[(opcode & 0x00F0) >> 4];
+            unsigned short height = opcode & 0x000F;
+            unsigned short pixel;
+
+            cpuRegisters[0xF] = 0;
+            for (int yline = 0; yline < height; yline++)
+            {
+                pixel = memory[indexRegister + yline];
+                for (int xline = 0; xline < 8; xline++)
+                {
+                    if ((pixel & (0x80 >> xline)) != 0)
+                    {
+                        if (gfx[(x + xline + ((y + yline) * 64))] == 1)
+                        {
+                            cpuRegisters[0xF] = 1;
+                        }
+                        gfx[x + xline + ((y + yline) * 64)] ^= 1;
+                    }
+                }
+            }
+
+            drawFlag = true;
+            programCounter += 2;
+            break;
+        }
+        default:
+        {
+            printf("Opcode not known or not implemented [0x0000]: 0x%X\n", opcode);
+            break;
+        }
+        break;
     }
 
     if (delayTimer > 0)

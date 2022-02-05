@@ -19,6 +19,8 @@ class chip8
         void emulateCycle();
         void initialize();
 
+        bool drawFlag;
+
         unsigned char currentKey[16];
         unsigned char gfx[64 * 32];
 

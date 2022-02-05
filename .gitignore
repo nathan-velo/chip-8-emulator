@@ -2,3 +2,8 @@
 /main.exe
 build/*
 CMakeLists.txt
+/.vs
+/Debug
+/chip-8-emulator.vcxproj.user
+/chip-8-emulator.vcxproj
+/chip-8-emulator.sln
