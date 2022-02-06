@@ -38,13 +38,12 @@ public:
 						Draw(x, y, olc::Pixel(255, 255, 255)); // Enabled
 				}
 		}
-
+		handleUserInput();
 		fAccumulatedTime += fElapsedTime;
 		if (fAccumulatedTime >= fTargetFrameTime)
 		{
 			fAccumulatedTime -= fTargetFrameTime;
 			fElapsedTime = fTargetFrameTime;
-			handleUserInput();
 			programChip.emulateCycle();
 		}
 		return true;
