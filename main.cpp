@@ -16,7 +16,7 @@ public:
 	}
 
 public:
-	float fTargetFrameTime = 1.0f / 600.0f; // Virtual FPS of 100fps
+	float fTargetFrameTime = 1.0f / 600.0f; // This is esentially time given per instruction
 	float fAccumulatedTime = 0.0f;
 
 	bool OnUserCreate() override
@@ -39,12 +39,16 @@ public:
 				}
 		}
 		handleUserInput();
+
 		fAccumulatedTime += fElapsedTime;
 		if (fAccumulatedTime >= fTargetFrameTime)
 		{
-			fAccumulatedTime -= fTargetFrameTime;
+			while (fAccumulatedTime > fTargetFrameTime)
+			{
+				programChip.emulateCycle();
+				fAccumulatedTime -= fTargetFrameTime;
+			}
 			fElapsedTime = fTargetFrameTime;
-			programChip.emulateCycle();
 		}
 		return true;
 	}

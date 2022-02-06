@@ -77,7 +77,7 @@ void chip8::initialize() {
 void chip8::emulateCycle() {
     //opcode is 2 bytes long so get 2 bytes from memory at current PC location
     opcode = memory[programCounter] << 8 | memory[programCounter + 1];
-    printf("%02x\n", (unsigned int)opcode);
+    //printf("%02x\n", (unsigned int)opcode);
 
     //Decode opcode using https://johnearnest.github.io/Octo/docs/chip8ref.pdf as a reference
     //Also using https://en.wikipedia.org/wiki/CHIP-8#Opcode_table as it has more detailed information
