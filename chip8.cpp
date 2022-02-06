@@ -375,6 +375,7 @@ void chip8::emulateCycle() {
                     memory[indexRegister + 1] = (cpuRegisters[(opcode & 0x0F00) >> 8] / 10) % 10;
                     memory[indexRegister + 2] = (cpuRegisters[(opcode & 0x0F00) >> 8] % 100) % 10;
                     programCounter += 2;
+                    break;
                 }
                 case 0x0055: // Stores from V0 to VX (including VX) in memory, starting at address I. The offset from I is increased by 1 for each value written, but I itself is left unmodified.					
                     for (int i = 0; i <= ((opcode & 0x0F00) >> 8); ++i)
