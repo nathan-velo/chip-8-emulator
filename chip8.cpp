@@ -1,6 +1,9 @@
 #include "chip8.h"
 #include <stdio.h>
 #include <stdlib.h> 
+#include <chrono>
+#include <thread>
+
 
 unsigned char chip8_fontset[80] =
 { 
@@ -34,6 +37,8 @@ chip8::chip8() {
     unsigned short stack[16];
     unsigned short stackPointer;
     unsigned char currentKey[16];
+    std::chrono::system_clock::time_point a = std::chrono::system_clock::now();
+    std::chrono::system_clock::time_point b = std::chrono::system_clock::now();
 }
 
 
@@ -94,7 +99,6 @@ void chip8::emulateCycle() {
             case 0x000E:
                 --stackPointer;
                 programCounter = stack[stackPointer];
-                programCounter += 2;
                 break;
 
             default: //UNKOWN WE'LL JUST IGNORE
@@ -269,6 +273,25 @@ void chip8::emulateCycle() {
         printf("BEEP!\n");
         --soundTimer;
     }
+
+    a = std::chrono::system_clock::now();
+    std::chrono::duration<double, std::milli> work_time = a - b;
+
+    const int instructionsPerSecond = 700;
+
+    if (work_time.count() < 1000.0 / instructionsPerSecond)
+    {
+        std::chrono::duration<double, std::milli> delta_ms(1000.0 / instructionsPerSecond - work_time.count());
+        auto delta_ms_duration = std::chrono::duration_cast<std::chrono::milliseconds>(delta_ms);
+        std::this_thread::sleep_for(std::chrono::milliseconds(delta_ms_duration.count()));
+    }
+
+    b = std::chrono::system_clock::now();
+    std::chrono::duration<double, std::milli> sleep_time = b - a;
+
+    // Your code here
+
+    printf("Time: %f \n", (work_time + sleep_time).count());
 }
 
 

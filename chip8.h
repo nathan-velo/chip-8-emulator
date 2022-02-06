@@ -1,4 +1,5 @@
 #pragma once
+#include <chrono>
 
 class chip8
 {
@@ -12,6 +13,8 @@ class chip8
         unsigned char soundTimer;
         unsigned short stack[16];
         unsigned short stackPointer;
+        std::chrono::system_clock::time_point a;
+        std::chrono::system_clock::time_point b;
     
     public:
         chip8(/* args */);
