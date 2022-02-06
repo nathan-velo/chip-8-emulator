@@ -7,3 +7,4 @@ CMakeLists.txt
 /chip-8-emulator.vcxproj.user
 /chip-8-emulator.vcxproj
 /chip-8-emulator.sln
+/x64
