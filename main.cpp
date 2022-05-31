@@ -5,14 +5,12 @@
 
 chip8 programChip;
 
-// Override base class with your custom functionality
-class Example : public olc::PixelGameEngine
+class ChipEngine : public olc::PixelGameEngine
 {
 public:
-	Example()
+	ChipStart()
 	{
-		// Name your application
-		sAppName = "Example";
+		sAppName = "Chip8";
 	}
 
 public:
@@ -93,7 +91,7 @@ public:
 
 int main(int argc, char** argv) {
 	programChip.loadFile("./currGame.c8");
-	Example demo;
+	ChipEngine demo;
 	if (demo.Construct(64, 32, 20, 20))
 		demo.Start();
 	return 0;
